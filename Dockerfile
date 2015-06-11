@@ -1,11 +1,9 @@
 FROM readytalk/nodejs:latest
 
-RUN npm install -g static
+RUN npm install -g node-static
 
 VOLUME /public
 
-WORKDIR /public
-
 EXPOSE 8080
 
-CMD ["static"]
+CMD static /public

@@ -1,11 +1,29 @@
-FROM debian:wheezy
+FROM ubuntu:latest
 
-RUN apt-get update -y && apt-get install --no-install-recommends -y -q curl python build-essential git ca-certificates
-RUN mkdir /nodejs && curl http://nodejs.org/dist/v0.12.4/node-v0.12.4-linux-x64.tar.gz | tar xvzf - -C /nodejs --strip-components=1
+MAINTAINER Paulo Henrique <ph.ouverney@gmail.com>
 
-ENV PATH $PATH:/nodejs/bin
+# make sure the package repository is up to date
+RUN echo "deb http://archive.ubuntu.com/ubuntu trusty main universe" > /etc/apt/sources.list
+RUN apt-get -y update
 
-RUN npm install -g node-static
+# install python-software-properties (so you can do add-apt-repository)
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y -q python-software-properties software-properties-common
+
+# install utilities
+RUN apt-get -y install vim git sudo zip bzip2 fontconfig curl
+
+# install node.js
+RUN curl -sL https://deb.nodesource.com/setup_0.12 | sudo bash -
+RUN apt-get install -y nodejs
+
+# install yeoman
+RUN npm install -g yo bower grunt-cli
+
+RUN npm install -g node-static bower
+
+RUN echo 'root:rootstatic' |chpasswd
+RUN groupadd static && useradd static -s /bin/bash -m -g static -G static && adduser static sudo
+RUN echo 'static:static' |chpasswd
 
 VOLUME /public
 
